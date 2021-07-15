@@ -1,0 +1,7 @@
+.venv
+.vscode
+*_cache
+__pycache__
+.python-version
+db.sqlite
+.DS_Store

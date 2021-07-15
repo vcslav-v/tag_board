@@ -1,0 +1,10 @@
+li.nav-item.active {
+    background: #eee;
+}
+.bg-primary{
+    background-color: #337ab7;
+}
+
+.badge{
+    font-size: 14px;
+}

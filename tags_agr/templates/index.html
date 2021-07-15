@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block app_content %}
+<div class="container">
+<div class="row">
+        <form class="col-md-6" method="post" action="/" enctype="multipart/form-data">
+            <label for="formFileMultiple" class="form-label">XLSX Templates</label>
+            <input class="form-control" type="file" name="file" id="formFileMultiple" multiple>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+</div>
+
+<div class="row">
+<form class="col-md-6" method="post" action="/" enctype="multipart/form-data">
+  <label for="exampleFormControlInput1" class="form-label">Item title</label>
+  <input type="text" name="title" class="form-control" id="exampleFormControlInput1">
+  <button type="submit" class="btn btn-primary mb-3">Search title</button>
+</form>
+<form class="col-md-6" method="post" action="/" enctype="multipart/form-data">
+  <label for="exampleFormControlInput1" class="form-label">Item tag</label>
+  <input type="text" name="tag" class="form-control" id="exampleFormControlInput1">
+  <button type="submit" class="btn btn-primary mb-3">Search tag</button>
+</form>
+</div>
+
+<div class="row">
+<div class="col-md-9">
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Title</th>
+      <th scope="col">Tags</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in search_results %}
+    <tr>
+      <th scope="row">{{ row[0] }}</th>
+      <td>{{ row[1] }}</td>
+      <td>{{ row[2] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="col-md-3">
+    <ul class="list-group">
+    {% for tag_stat in tag_stats %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{tag_stat[0]}}
+        <span class="badge bg-primary rounded-pill">{{tag_stat[1]}}</span>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+</div>
+</div>
+{% endblock %}
