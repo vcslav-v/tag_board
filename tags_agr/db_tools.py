@@ -25,7 +25,7 @@ def get_items_by_title(title: str):
     db = SessionLocal()
     search = "%{}%".format(title)
     stock_items = db.query(models.StockItem).filter(
-        models.StockItem.title.like(search)
+        models.StockItem.title.ilike(search)
     ).all()
     result = []
     all_tags = []
