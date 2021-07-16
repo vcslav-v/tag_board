@@ -1,12 +1,12 @@
 import pandas as pd
 import os
-from tags_agr import db_tools
+from tags_agr import db_tools, UPLOAD_FOLDER_ADOBE
 
 
-def get_xlsx_file_path(path: str):
-    for xlsx_file in os.listdir(path):
-        if os.path.splitext(xlsx_file)[-1] == '.xlsx':
-            yield os.path.join(path, xlsx_file)
+def uploaded_files():
+    for adobe_file_path in os.listdir(UPLOAD_FOLDER_ADOBE):
+        yield os.path.join(UPLOAD_FOLDER_ADOBE, adobe_file_path)
+        os.remove(os.path.join(UPLOAD_FOLDER_ADOBE, adobe_file_path))
 
 
 def get_df(xlsx_file_path: str) -> pd.DataFrame:
@@ -21,8 +21,7 @@ def push_to_db(df: pd.DataFrame):
         db_tools.push(row.Title, row.Keywords)
 
 
-def new_data(files):
-    for xlsx_file_path in files:
-        if os.path.splitext(xlsx_file_path.filename)[-1] == '.xlsx':
-            df = get_df(xlsx_file_path)
-            push_to_db(df)
+def add_new_data():
+    for adobe_file_path in uploaded_files():
+        df = get_df(adobe_file_path)
+        push_to_db(df)

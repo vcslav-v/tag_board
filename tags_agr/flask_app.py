@@ -1,10 +1,15 @@
 from os import environ
+from threading import Thread
+
 from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import check_password_hash, generate_password_hash
-from tags_agr.main import new_data
-from tags_agr import db_tools
+from werkzeug.utils import secure_filename
+
+from tags_agr import db_tools, UPLOAD_FOLDER_ADOBE
+from tags_agr.main import add_new_data
+import os
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -13,6 +18,15 @@ app.config['SECRET_KEY'] = 'you-will-never-guess'
 users = {
     environ.get('SITE_LOGIN') or 'root': generate_password_hash(environ.get('SITE_PASS') or 'pass'),
 }
+
+
+def upload(files):
+    if not os.path.isdir(UPLOAD_FOLDER_ADOBE):
+        os.mkdir(UPLOAD_FOLDER_ADOBE)
+    for xlsx_file in files:
+        if os.path.splitext(xlsx_file.filename)[-1] == '.xlsx':
+            filename = secure_filename(xlsx_file.filename)
+            xlsx_file.save(os.path.join(UPLOAD_FOLDER_ADOBE, filename))
 
 
 @auth.verify_password
@@ -32,7 +46,9 @@ def index():
         title_for_search = request.form.get('title')
         tag_for_search = request.form.get('tag')
         if files:
-            new_data(files)
+            upload(files)
+            tread = Thread(target=add_new_data)
+            tread.start()
         elif title_for_search:
             search_results, tag_stats = db_tools.get_items_by_title(title_for_search.strip())
         elif tag_for_search:
