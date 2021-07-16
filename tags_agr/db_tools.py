@@ -10,7 +10,7 @@ def push(raw_title: str, tags: List[str]):
     stock_item = models.StockItem(title=title)
     db.add(stock_item)
 
-    for raw_tag in tags:
+    for raw_tag in set(tags):
         tag = raw_tag.strip()
         tag_item = db.query(models.Tag).filter_by(name=tag).first()
         if not tag_item:
