@@ -1,15 +1,16 @@
+import os
 from os import environ
 from threading import Thread
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 from flask_bootstrap import Bootstrap
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from tags_agr import db_tools, UPLOAD_FOLDER_ADOBE
+from tags_agr import (RESULT_FOLDER_RESIZE, UPLOAD_FOLDER_ADOBE,
+                      UPLOAD_FOLDER_RESIZE, db_tools, resize)
 from tags_agr.main import add_new_data
-import os
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -20,13 +21,12 @@ users = {
 }
 
 
-def upload(files):
-    if not os.path.isdir(UPLOAD_FOLDER_ADOBE):
-        os.mkdir(UPLOAD_FOLDER_ADOBE)
-    for xlsx_file in files:
-        if os.path.splitext(xlsx_file.filename)[-1] == '.xlsx':
-            filename = secure_filename(xlsx_file.filename)
-            xlsx_file.save(os.path.join(UPLOAD_FOLDER_ADOBE, filename))
+def upload(files, directory=UPLOAD_FOLDER_ADOBE):
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+    for up_file in files:
+        filename = secure_filename(up_file.filename)
+        up_file.save(os.path.join(directory, filename))
 
 
 @auth.verify_password
@@ -54,6 +54,32 @@ def index():
         elif tag_for_search:
             search_results, tag_stats = db_tools.get_items_by_tag(tag_for_search.strip())
     return render_template('index.html', search_results=search_results, tag_stats=tag_stats)
+
+
+@app.route('/resize', methods=['POST', 'GET'])
+@auth.login_required
+def resize_img():
+    status = {}
+    if request.method == 'POST':
+        files = request.files.getlist('file')
+        resize_width = request.form.get('resize_width')
+        if files:
+            upload(files, UPLOAD_FOLDER_RESIZE)
+            tread = Thread(target=resize.run, args=(resize_width,))
+            tread.start()
+    list_upload_dir = os.listdir(UPLOAD_FOLDER_RESIZE)
+    if list_upload_dir:
+        status['progress'] = len(list_upload_dir)
+    elif os.path.exists('tiny_result.zip'):
+        status['result'] = True
+    return render_template('resize.html', status=status)
+
+
+@app.route("/last_tiny")
+@auth.login_required
+def last_tiny():
+    if os.path.exists('tiny_result.zip'):
+        return send_file(os.path.abspath('tiny_result.zip'))
 
 
 if __name__ == "__main__":

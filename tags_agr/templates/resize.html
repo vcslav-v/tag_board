@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block app_content %}
+<div class="container">
+<div class="row">
+        <form class="col-md-6" method="post" action="{{ url_for('resize_img') }}" enctype="multipart/form-data">
+            <label for="formFileMultiple" class="form-label">Images</label>
+            <input class="form-control" type="file" name="file" id="formFileMultiple" multiple>
+            <input type="text" name="resize_width" class="form-control" placeholder="width" aria-label="width" aria-describedby="basic-addon1">
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+        <div class="col-md-6" style="margin-top: 50px;">
+        {% if status.get('progress') %}
+          <p class="text-muted">{{ status.get('progress') }} files left...</p>
+        {% elif status.get('result') %}
+          <a href="{{ url_for('last_tiny') }}">Last result.</a>
+        {% endif %}
+        </div>
+</div>
+
+</div>
+{% endblock %}
