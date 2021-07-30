@@ -7,7 +7,7 @@ if environ.get('DATABASE_URL'):
         'postgres', 'postgresql+psycopg2'
     )
 else:
-    SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite:///db.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:mysecretpassword@0.0.0.0/postgres'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -4,10 +4,22 @@ from tags_agr.db import SessionLocal
 from collections import Counter
 
 
-def push(raw_title: str, tags: List[str]):
+def push(raw_title: str, tags: List[str], batch_num: int):
     db = SessionLocal()
     title = raw_title.strip()
-    stock_item = models.StockItem(title=title)
+    batch_item = db.query(models.Batch).filter_by(number=batch_num).first()
+    stock_item = db.query(models.StockItem).filter_by(
+        title=title,
+        batch=batch_item,
+    ).first()
+    if stock_item:
+        db.close()
+        return
+
+    if not batch_item:
+        batch_item = models.Batch(number=batch_num)
+        db.add(batch_item)
+    stock_item = models.StockItem(title=title, batch=batch_item)
     db.add(stock_item)
 
     for raw_tag in set(tags):

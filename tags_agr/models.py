@@ -27,6 +27,9 @@ class StockItem(Base):
         secondary=association_table,
         back_populates='stock_items')
 
+    batch_id = Column(Integer, ForeignKey('batches.id'))
+    batch = relationship('Batch', back_populates='stock_items')
+
 
 class Tag(Base):
     """Stock item's tags."""
@@ -42,3 +45,14 @@ class Tag(Base):
         secondary=association_table,
         back_populates='tags')
 
+
+class Batch(Base):
+    """Batch number."""
+
+    __tablename__ = 'batches'
+
+    id = Column(Integer, primary_key=True)
+
+    number = Column(Integer, unique=True)
+
+    stock_items = relationship('StockItem', back_populates='batch')
