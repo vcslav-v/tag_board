@@ -6,7 +6,7 @@ UPLOAD_FOLDER_RESIZE = 'resize_upload'
 RESULT_FOLDER_RESIZE = 'resize_result'
 
 if not os.path.isdir(UPLOAD_FOLDER_ADOBE):
-    os.mkdir(UPLOAD_FOLDER_RESIZE)
+    os.mkdir(UPLOAD_FOLDER_ADOBE)
 
 if not os.path.isdir(UPLOAD_FOLDER_RESIZE):
     os.mkdir(UPLOAD_FOLDER_RESIZE)
