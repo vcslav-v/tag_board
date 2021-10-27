@@ -14,6 +14,7 @@
         {% elif status.get('tiny_result') %}
           <a href="{{ url_for('last_tiny') }}">Last result.</a>
         {% endif %}
+        </div>
 </div>
 <div class="row">
   <form class="col-md-6" method="post" action="{{ url_for('resize_img') }}" enctype="multipart/form-data">
@@ -23,11 +24,11 @@
   </form>
   <div class="col-md-6" style="margin-top: 50px;">
   {% if status.get('long_progress') %}
-    <p class="text-muted">{{ status.get('long_progress') }} files left...</p>
+    <p class="text-muted">Gluing ...</p>
   {% elif status.get('long_result') %}
     <a href="{{ url_for('last_long') }}">Last result.</a>
   {% endif %}
-</div>
+  </div>
 </div>
 
 </div>

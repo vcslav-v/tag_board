@@ -8,8 +8,8 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from tags_agr import UPLOAD_FOLDER_ADOBE, UPLOAD_FOLDER_RESIZE, UPLOAD_FOLDER_LONG
-from tags_agr import db_tools, resize, long
+from tags_agr import (UPLOAD_FOLDER_ADOBE, UPLOAD_FOLDER_LONG,
+                      UPLOAD_FOLDER_RESIZE, db_tools, long, resize)
 from tags_agr.main import add_new_data
 
 app = Flask(__name__)
@@ -24,6 +24,8 @@ users = {
 def upload(files, directory=UPLOAD_FOLDER_ADOBE):
     if not os.path.isdir(directory):
         os.mkdir(directory)
+    for img_file in os.listdir(directory):
+        os.remove(os.path.join(directory, img_file))
     for up_file in files:
         filename = secure_filename(up_file.filename)
         up_file.save(os.path.join(directory, filename))
@@ -80,7 +82,7 @@ def resize_img():
         status['tiny_result'] = True
 
     if list_long_upload_dir:
-        status['long_progress'] = len(list_long_upload_dir)
+        status['long_progress'] = True
     elif os.path.exists('long_result.jpg'):
         status['long_result'] = True
     return render_template('resize.html', status=status)
