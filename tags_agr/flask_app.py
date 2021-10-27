@@ -8,8 +8,8 @@ from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from tags_agr import (RESULT_FOLDER_RESIZE, UPLOAD_FOLDER_ADOBE,
-                      UPLOAD_FOLDER_RESIZE, db_tools, resize)
+from tags_agr import UPLOAD_FOLDER_ADOBE, UPLOAD_FOLDER_RESIZE, UPLOAD_FOLDER_LONG
+from tags_agr import db_tools, resize, long
 from tags_agr.main import add_new_data
 
 app = Flask(__name__)
@@ -61,17 +61,28 @@ def index():
 def resize_img():
     status = {}
     if request.method == 'POST':
-        files = request.files.getlist('file')
+        tiny_files = request.files.getlist('tiny_file')
+        long_files = request.files.getlist('long_file')
         resize_width = request.form.get('resize_width')
-        if files:
-            upload(files, UPLOAD_FOLDER_RESIZE)
+        if tiny_files:
+            upload(tiny_files, UPLOAD_FOLDER_RESIZE)
             tread = Thread(target=resize.run, args=(resize_width,))
             tread.start()
-    list_upload_dir = os.listdir(UPLOAD_FOLDER_RESIZE)
-    if list_upload_dir:
-        status['progress'] = len(list_upload_dir)
+        elif long_files:
+            upload(long_files, UPLOAD_FOLDER_LONG)
+            tread = Thread(target=long.run)
+            tread.start()
+    list_resize_upload_dir = os.listdir(UPLOAD_FOLDER_RESIZE)
+    list_long_upload_dir = os.listdir(UPLOAD_FOLDER_LONG)
+    if list_resize_upload_dir:
+        status['tiny_progress'] = len(list_resize_upload_dir)
     elif os.path.exists('tiny_result.zip'):
-        status['result'] = True
+        status['tiny_result'] = True
+
+    if list_long_upload_dir:
+        status['long_progress'] = len(list_long_upload_dir)
+    elif os.path.exists('long_result.jpg'):
+        status['long_result'] = True
     return render_template('resize.html', status=status)
 
 
@@ -80,6 +91,13 @@ def resize_img():
 def last_tiny():
     if os.path.exists('tiny_result.zip'):
         return send_file(os.path.abspath('tiny_result.zip'))
+
+
+@app.route("/last_long")
+@auth.login_required
+def last_long():
+    if os.path.exists('long_result.jpg'):
+        return send_file(os.path.abspath('long_result.jpg'))
 
 
 if __name__ == "__main__":

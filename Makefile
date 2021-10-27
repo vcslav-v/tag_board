@@ -72,13 +72,7 @@ coverage:
 	poetry run pytest --cov=$(APP_NAME) --cov-report xml tests/
 
 req:
-	poetry export>requirements.txt
+	poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-env:
-	export FLASK_APP="gamemaster_bot.app"
-	export DOMAIN=127.0.0.1:5000
-	export BOT_TOKEN="386692915:AAFS9qFwTSkzSRVFjesBifBz3SjPAye4IOI"
-	export DB_URL=127.0.0.1:8000
-	export REDIS="localhost"
 db:
 	docker run --name test-postgres -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_DB=postgres -d -p 5432:5432 postgres
