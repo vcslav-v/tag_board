@@ -2,6 +2,7 @@ from typing import List
 from tags_agr import models
 from tags_agr.db import SessionLocal
 from collections import Counter
+from tags_agr import schemas
 
 
 def push(raw_title: str, tags: List[str], batch_num: int):
@@ -33,34 +34,54 @@ def push(raw_title: str, tags: List[str], batch_num: int):
     db.close()
 
 
-def get_items_by_title(title: str):
-    db = SessionLocal()
-    search = "%{}%".format(title)
-    stock_items = db.query(models.StockItem).filter(
-        models.StockItem.title.ilike(search)
-    ).all()
-    result = []
-    all_tags = []
-    for i, stock_item in enumerate(stock_items):
-        tags = [tag.name for tag in stock_item.tags]
-        all_tags.extend(tags)
-        result.append((i, stock_item.title, ', '.join(tags)))
-    db.close()
-    tag_stats = sorted(Counter(all_tags).items(), key=lambda x: x[1], reverse=True)
-    return result, tag_stats
+def get_items_by_title(title: str) -> schemas.SearchResult:
+    result = schemas.SearchResult(
+        items=[],
+        tags_stat=[],
+    )
+    with SessionLocal() as db:
+        search = "%{}%".format(title)
+        stock_items = db.query(models.StockItem).filter(
+            models.StockItem.title.ilike(search)
+        ).all()
+        all_tags = []
+        for stock_item in stock_items:
+            tags = [tag.name for tag in stock_item.tags]
+            all_tags.extend(tags)
+            result.items.append(schemas.Item(
+                batch=stock_item.batch.number,
+                title=stock_item.title,
+                tags=tags,
+            ))
+    result.tags_stat = sorted(
+        Counter(all_tags).items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+    return result
 
 
-def get_items_by_tag(tag: str):
-    db = SessionLocal()
-    items_tag = db.query(models.Tag).filter_by(
-        name=tag.lower()
-    ).first()
-    result = []
-    all_tags = []
-    for i, stock_item in enumerate(items_tag.stock_items):
-        tags = [tag.name for tag in stock_item.tags]
-        all_tags.extend(tags)
-        result.append((i, stock_item.title, ', '.join(tags)))
-    db.close()
-    tag_stats = sorted(Counter(all_tags).items(), key=lambda x: x[1], reverse=True)
-    return result, tag_stats
+def get_items_by_tag(tag: str) -> schemas.SearchResult:
+    result = schemas.SearchResult(
+        items=[],
+        tags_stat=[],
+    )
+    with SessionLocal() as db:
+        items_tag = db.query(models.Tag).filter_by(
+            name=tag.lower()
+        ).first()
+        all_tags = []
+        for stock_item in items_tag.stock_items:
+            tags = [tag.name for tag in stock_item.tags]
+            all_tags.extend(tags)
+            result.items.append(schemas.Item(
+                batch=stock_item.batch.number,
+                title=stock_item.title,
+                tags=tags,
+            ))
+    result.tags_stat = sorted(
+        Counter(all_tags).items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+    return result
