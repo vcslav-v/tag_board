@@ -36,7 +36,7 @@ trio = ["trio (>=0.16)"]
 name = "asgiref"
 version = "3.4.1"
 description = "ASGI specs, helper code, and adapters"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -47,7 +47,7 @@ tests = ["pytest", "pytest-asyncio", "mypy (>=0.800)"]
 name = "click"
 version = "8.0.3"
 description = "Composable command line interface toolkit"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -130,7 +130,7 @@ tornado = ["tornado (>=0.2)"]
 name = "h11"
 version = "0.12.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -435,7 +435,7 @@ python-versions = "*"
 name = "uvicorn"
 version = "0.15.0"
 description = "The lightning-fast ASGI server."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -473,7 +473,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "dc5e7928ff959898f0319bbf3d608f4c94cb2c1da7f8289e02430907246849ab"
+content-hash = "4981038a0bfbf391578ab28d4269fcca85d411dec084f24c4bdf006a6a5cd60f"
 
 [metadata.files]
 alembic = [
